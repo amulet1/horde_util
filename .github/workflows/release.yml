@@ -24,7 +24,6 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-        ### temp
         ref: FRAMEWORK_6_0
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -40,14 +39,15 @@ jobs:
 
           # Allow Horde installer plugin
           composer global config --no-plugins allow-plugins.horde/horde-installer-plugin true
-          
+
           composer global config minimum-stability dev
           composer global require horde/components "dev-FRAMEWORK_6_0"
           alias horde-components="~/.config/composer/web/components/bin/horde-components"
     - name: write changelog
       run: |
           entries_amount=0; max_entries=100
-          PATTERN="^\[.*\] .*"
+
+          declare -a feat_commits fix_commits other_commits
 
           for commit in $(git rev-list FRAMEWORK_6_0)
           do
@@ -55,12 +55,61 @@ jobs:
             if [[ $msg == 'Release '* ]]; then break; fi
             if [[ $msg == 'Released'* ]]; then break; fi
             if [[ $msg == 'Development mode for'* ]]; then break; fi
-            if [[ $msg != 'Merge '* ]]; then
-              echo horde-components -c doc/components.conf changed "$msg"
-              let "entries_amount+=1"
-              if [ $entries_amount -gt $max_entries ]; then break; fi
+            if [[ $msg == 'Merge '* ]]; then continue; fi
+
+            if [[ -z "$msg" ]]; then continue; fi
+
+            if [[ $msg =~ ^([a-z]+):[[:space:]]*(.*) ]]; then
+              prefix="${BASH_REMATCH[1]}"
+              clean_msg="${BASH_REMATCH[2]}"
+            else
+              prefix=""
+              clean_msg="$msg"
             fi
+
+            if [[ $prefix == "feat" ]]; then
+              feat_commits+=("$clean_msg")
+            elif [[ $prefix == "fix" ]]; then
+              fix_commits+=("$clean_msg")
+            else
+              # restore unknown non-empty prefix so it's not lost
+              [[ -z $prefix || $prefix == "chore" ]] || clean_msg="$prefix: $clean_msg"
+              other_commits+=("$clean_msg")
+            fi
+            let "entries_amount+=1"
+
+            if [ $entries_amount -gt $max_entries ]; then break; fi
           done
+
+          release_msg=""
+
+          if [ ${#feat_commits[@]} -gt 0 ]; then
+            release_msg+="New Features:\n"
+            for msg in "${feat_commits[@]}"; do
+              release_msg+="  - $msg\n"
+            done
+            release_msg+="\n"
+          fi
+
+          if [ ${#fix_commits[@]} -gt 0 ]; then
+            release_msg+="Fixes:\n"
+            for msg in "${fix_commits[@]}"; do
+              release_msg+="  - $msg\n"
+            done
+            release_msg+="\n"
+          fi
+
+          if [ ${#other_commits[@]} -gt 0 ]; then
+            release_msg+="Other:\n"
+            for msg in "${other_commits[@]}"; do
+              release_msg+="  - $msg\n"
+            done
+          fi
+
+          echo -e "$release_msg"
+
+          echo horde-components -c doc/components.conf changed "$release_msg"
+
     - name: make release and push
       run: |
           echo horde-components -c doc/components.conf release for upstream
