@@ -34,7 +34,7 @@ jobs:
     - name: Setup composer
       run: |
           composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
-          composer global config repositories.0 composer https://horde-satis.maintaina.com
+          #composer global config repositories.0 composer https://horde-satis.maintaina.com
           composer global config minimum-stability dev
           composer global require horde/components "dev-FRAMEWORK_6_0"
           alias horde-components="~/.config/composer/web/components/bin/horde-components"
@@ -50,12 +50,12 @@ jobs:
             if [[ $msg == 'Released'* ]]; then break; fi
             if [[ $msg == 'Development mode for'* ]]; then break; fi
             if [[ $msg =~ $PATTERN ]]; then
-              horde-components -c doc/components.conf changed "$msg"
+              echo horde-components -c doc/components.conf changed "$msg"
               let "entries_amount+=1"
             fi
           done
     - name: make release and push
       run: |
-          horde-components -c doc/components.conf release for maintaina
-          git push
-          git push origin --tags
+          echo horde-components -c doc/components.conf release for upstream
+          echo git push
+          echo git push origin --tags
