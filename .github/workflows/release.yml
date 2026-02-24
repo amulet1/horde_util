@@ -46,6 +46,8 @@ jobs:
       run: |
           entries_amount=0; max_entries=100
           PATTERN="^\[.*\] .*"
+          
+          git status
 
           for commit in $(git rev-list FRAMEWORK_6_0)
           do
