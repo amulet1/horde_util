@@ -35,6 +35,10 @@ jobs:
       run: |
           composer config -g github-oauth.github.com ${{ secrets.GITHUB_TOKEN }}
           #composer global config repositories.0 composer https://horde-satis.maintaina.com
+
+          # Allow Horde installer plugin
+          composer config --no-plugins allow-plugins.horde/horde-installer-plugin true
+          
           composer global config minimum-stability dev
           composer global require horde/components "dev-FRAMEWORK_6_0"
           alias horde-components="~/.config/composer/web/components/bin/horde-components"
