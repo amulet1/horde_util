@@ -31,6 +31,5 @@ run-tests.log
 /composer.lock
 /var
 /web
-/.phpunit.cache
-.phpunit.results.cache
+.phpunit.result.cache
 .php-cs-fixer.cache
