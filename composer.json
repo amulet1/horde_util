@@ -51,7 +51,8 @@
             "Horde": "lib/"
         },
         "psr-4": {
-            "Horde\\Util\\": "src/"
+            "Horde\\Util\\": "src/",
+            "": "root/"
         }
     },
     "autoload-dev": {

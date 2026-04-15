@@ -57,8 +57,9 @@ dependencies:
       horde/test: ^3
       pear/pear: '*'
 autoload:
-  classmap:
-    - lib/
+  psr-0:
+    Horde: lib/
   psr-4:
     Horde\Util\: src/
+    "": root/
 vendor: horde6
