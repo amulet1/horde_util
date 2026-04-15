@@ -1,5 +1,8 @@
 {
-    "name": "horde/util",
+    "name": "horde6/util",
+    "replace": {
+        "horde/util": "^3 || dev-FRAMEWORK_6_0"
+    },
     "description": "Utility library",
     "type": "library",
     "homepage": "https://www.horde.org/libraries/Horde_Util",
@@ -44,9 +47,9 @@
         "ext-xml": "*"
     },
     "autoload": {
-        "classmap": [
-            "lib/"
-        ],
+        "psr-0": {
+            "Horde": "lib/"
+        },
         "psr-4": {
             "Horde\\Util\\": "src/"
         }
